@@ -1,22 +1,22 @@
 # Tizen client — implementation handoff (2026-10-02)
 
 The work for `design/tizen-client-implementation-plan.md` (planning `main` @ `6f6c989`), done from a
-cloud session. The client-web pull requests are merged into `main`; the monorepo pieces are here
-as patch series, rebased onto Gitea `main` @ `270349a`, waiting on a Gitea credential to push.
-Every on-device gate is open.
+cloud session. The client-web pull requests are merged into `main`. The monorepo pieces are pushed
+to Gitea as pull requests #1683 (T1), #1684 (console kit) and #1685 (docs), on `main` @ `270349a`;
+the patch series here are the same commits, kept as a record. Every on-device gate is open.
 
 ## Where things are
 
 | Package | What | Where | State |
 |---|---|---|---|
-| T1 host | plaintext bootstrap, `/mgmt` tunnel, D5, docs line | `patches/monorepo/t1/` (3 patches on `unom/punktfunk` `main` @ `270349a`) | code + tests done; not pushed; gate open |
+| T1 host | plaintext bootstrap, `/mgmt` tunnel, D5, docs line | monorepo [#1683](https://git.unom.io/unom/punktfunk/pulls/1683) (`patches/monorepo/t1/` is the same series) | PR open, CI running; gate open |
 | T2 client | `tunnel.ts`, bootstrap, injection, `--mode tizen`, `.wgt`, lifecycle, codec/WebGL2 gates | client-web [#42](https://github.com/punktfunk/client-web/pull/42) | **merged** (`372a6bb`); gate open |
 | T3 remote | Back, HUD and sheets by remote, IME text entry, Quit → exit, console-first | client-web [#43](https://github.com/punktfunk/client-web/pull/43) | **merged** (`6fa6ad0`); gate open |
-| T3 console kit | `Platform::Tizen` in `pf-console-ui` + bridge flag + test | `patches/monorepo/t3-console-kit/` (1 patch on `main` @ `270349a`) | code + tests done (396/396 kit tests); not pushed |
+| T3 console kit | `Platform::Tizen` in `pf-console-ui` + bridge flag + test | monorepo [#1684](https://git.unom.io/unom/punktfunk/pulls/1684) | PR open, CI running (396/396 kit tests here) |
 | T3 re-pin | the three crate pins + one line in `rust/host.rs` | `patches/client-web/after-repin.patch` (instructions) | after the kit merges |
 | T4 | measured first stream | — | not started |
 | T5 CI | `.wgt` on `v*` releases | client-web [#44](https://github.com/punktfunk/client-web/pull/44) | **merged** (`4e2d7c3`) |
-| T5 docs | `samsung-tv.md` + links | `patches/monorepo/t5-docs/` | done; not pushed |
+| T5 docs | `samsung-tv.md` + links | monorepo [#1685](https://git.unom.io/unom/punktfunk/pulls/1685) | PR open, CI running |
 | T5 catalog | Apps2Samsung PR | — | needs the maintainer's yes (outward publish) |
 | T5 diagnostics line | model, Tizen version, firmware, Chromium in the sent log | in #42 (`logs.ts`) | done |
 
