@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+# The package, from client-web at the pinned ref: the same toolchain its own CI uses (Node 24,
+# emsdk 6.0.10, the Rust toolchain its rust-toolchain.toml names), then this repository's build.
+# Unsigned on purpose — a set only installs a package signed for its own DUID, so each owner
+# signs their copy (Apps2Samsung, or tools/sign.sh), and this job needs no Tizen SDK. A `v*` tag
+# attaches the `.wgt` to the release, which is what the Apps2Samsung catalog entry reads.
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # `git describe` names the package version; it needs the tags.
+          fetch-depth: 0
+      - id: ref
+        run: echo "sha=$(cat client-web.ref)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v7
+        with:
+          repository: punktfunk/client-web
+          ref: ${{ steps.ref.outputs.sha }}
+          path: client-web
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: client-web/package-lock.json
+      - uses: mymindstorm/setup-emsdk@v16
+        with:
+          version: 6.0.10
+      - run: rustup toolchain install
+        working-directory: client-web/packages/stream
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: client-web/packages/stream
+      - run: node tools/build.mjs
+        env:
+          CLIENT_WEB: ${{ github.workspace }}/client-web
+      - uses: actions/upload-artifact@v7
+        with:
+          name: punktfunk-tizen
+          path: build/punktfunk-tizen-*.wgt
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" build/punktfunk-tizen-*.wgt --verify-tag --generate-notes

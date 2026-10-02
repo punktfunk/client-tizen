@@ -1,0 +1,13 @@
+{
+  "name": "punktfunk",
+  "description": "Stream games from your punktfunk host. The punktfunk browser client packaged for Samsung TVs (Tizen 8.0 and later).",
+  "repo": "punktfunk/client-tizen",
+  "source": "release",
+  "branch": "release",
+  "assets": [
+    {
+      "match": "^punktfunk-tizen-.*\\.wgt$",
+      "output_name": "punktfunk.wgt"
+    }
+  ]
+}

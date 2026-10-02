@@ -1,0 +1,16 @@
+{
+  "name": "punktfunk-client-tizen",
+  "private": true,
+  "type": "module",
+  "description": "The punktfunk client for Samsung TVs: the browser client (punktfunk/client-web) packaged as a Tizen .wgt.",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "icon": "node tools/icon.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

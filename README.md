@@ -1,105 +1,74 @@
-# Tizen client — implementation handoff (2026-10-02)
+# punktfunk for Samsung TV
 
-The work for `design/tizen-client-implementation-plan.md` (planning `main` @ `6f6c989`), done from a
-cloud session. The client-web pull requests are merged into `main`. The monorepo pieces are pushed
-to Gitea as pull requests #1683 (T1), #1684 (console kit) and #1685 (docs), on `main` @ `270349a`;
-the patch series here are the same commits, kept as a record. Every on-device gate is open.
+The punktfunk client for Samsung TVs, as a Tizen web app. It is the
+[browser client](https://github.com/punktfunk/client-web) packaged as a `.wgt`: the same page,
+started in Punktfunk Console for the remote, reaching the host through the browser plane because a
+packaged page cannot `fetch` a self-signed host. Nothing is forked. This repository holds what the
+package needs beyond the page: the manifest, the icon, the build that produces the `.wgt`, the
+signing route, and the catalog entry.
 
-## Where things are
+Sets from 2024 on (Tizen 8.0, Chromium 108). A preview, sideloaded: Samsung's store does not carry
+it, and a set only installs a package signed for its own DUID, so the release asset is unsigned and
+each owner signs their copy.
 
-| Package | What | Where | State |
-|---|---|---|---|
-| T1 host | plaintext bootstrap, `/mgmt` tunnel, D5, docs line | monorepo [#1683](https://git.unom.io/unom/punktfunk/pulls/1683) (`patches/monorepo/t1/` is the same series) | PR open, CI running; gate open |
-| T2 client | `tunnel.ts`, bootstrap, injection, `--mode tizen`, `.wgt`, lifecycle, codec/WebGL2 gates | client-web [#42](https://github.com/punktfunk/client-web/pull/42) | **merged** (`372a6bb`); gate open |
-| T3 remote | Back, HUD and sheets by remote, IME text entry, Quit → exit, console-first | client-web [#43](https://github.com/punktfunk/client-web/pull/43) | **merged** (`6fa6ad0`); gate open |
-| T3 console kit | `Platform::Tizen` in `pf-console-ui` + bridge flag + test | monorepo [#1684](https://git.unom.io/unom/punktfunk/pulls/1684) | PR open, CI running (396/396 kit tests here) |
-| T3 re-pin | the three crate pins + one line in `rust/host.rs` | `patches/client-web/after-repin.patch` (instructions) | after the kit merges |
-| T4 | measured first stream | — | not started |
-| T5 CI | `.wgt` on `v*` releases | client-web [#44](https://github.com/punktfunk/client-web/pull/44) | **merged** (`4e2d7c3`) |
-| T5 docs | `samsung-tv.md` + links | monorepo [#1685](https://git.unom.io/unom/punktfunk/pulls/1685) | PR open, CI running |
-| T5 catalog | Apps2Samsung PR | — | needs the maintainer's yes (outward publish) |
-| T5 diagnostics line | model, Tizen version, firmware, Chromium in the sent log | in #42 (`logs.ts`) | done |
+**Install it:** [Samsung TV](https://docs.punktfunk.unom.io/docs/samsung-tv) on the docs site walks
+through the host, the set's Developer Mode, Apps2Samsung or the command line, and pairing.
 
-The security review for the T1 PR body is `review/T1-security-review.md`. The outcome text for the
-planning doc and its index is `planning/outcomes.md`.
+## What is in the box
 
-## What the maintainer does next, in order
+| Path | What |
+|---|---|
+| `client-web.ref` | The client-web commit the package is built from. Bump it to ship a newer page. |
+| `tizen/config.xml` | The widget manifest: package id `punktfunk0`, application id `punktfunk0.punktfunk`, the public privileges, game mode. `version` is set at build time. |
+| `tizen/icon.png` | 512×423, rendered from the brand mark by `tools/icon.mjs`. |
+| `tools/build.mjs` | Checks out client-web at the ref, builds it, adds Samsung's `webapis.js` to the page, drops the source maps, adds the manifest and icon, zips `build/punktfunk-tizen-<version>.wgt`. |
+| `tools/sign.sh` | Signs the staged package for one set in the Tizen CLI container, and with `install` pushes and launches it there. |
+| `tools/toolchain/Dockerfile` | Tizen SDK 10.0 `web-cli` (`tizen`, `sdb`) plus the Samsung certificate extension, as an amd64 image: Samsung ships `sdb` for Intel only. |
+| `catalog/punktfunk__client-tizen.json` | The Apps2Samsung catalog entry, which reads this repository's releases. |
+| `.github/workflows/ci.yml` | Builds the package on every push and pull request; a `v*` tag attaches it to the release. |
 
-1. **T1 to Gitea.** In the monorepo at `origin/main`: `git am patches/monorepo/t1/*.patch`, push
-   as `tizen/t1-mgmt-tunnel`, open the PR with `review/T1-security-review.md` as the body's review
-   section. Gates it passed here: `cargo test -p punktfunk-host` (968/968), clippy `-D warnings`,
-   fmt, `check-writing.sh`, `check-docs-drift.sh`. The patches are rebased onto Gitea `main` @
-   `270349a` and the targeted tests were rerun there.
-2. **T1 gate** (Mac Studio, host `.21` rebuilt with T1): check out client-web `main`,
-   `PF_HOST` unset, `npx vite` in `apps/web`, open
-   `http://127.0.0.1:5173/_e2e.html?tunnel=1&host=192.168.1.21` in Safari. Pairs (Request access
-   or `&pin=`) and lists the library through the tunnel; the page-server and direct paths still work
-   as before. With Browser origins set on the host, the TV (and this page, which sends an
-   `http://127.0.0.1:5173` origin that is not listed) must still be admitted to the plane — the
-   page's CORS read of the bootstrap needs its origin listed or the list empty, so test D5 with the
-   TV, not Safari.
-3. **T2 gate** (monitor, ask before each install): on the Mac Studio with emsdk,
-   `npm run build:tizen` in client-web at `main` → `apps/web/punktfunk-tizen-<v>.wgt`.
-   Sign and install with `design/tizen-probe/package-app.sh` as the template (unzip the `.wgt`, sign
-   the directory, `tizen install`). Launch, add `.21` by address, Request access, approve, library
-   and covers. The USB keyboard is allowed for this one.
-4. **T3 kit to Gitea**: `git am patches/monorepo/t3-console-kit/*.patch` on `main`, push as
-   `tizen/t3-console-platform`, PR, merge. Gates it passed here: `cargo test -p pf-console-ui
-   --no-default-features` (396/396; this container has no SDL3 for the desktop feature's link),
-   clippy `-D warnings` with default features, fmt, `check-writing.sh`.
-   Then in client-web on `main`: `patches/client-web/after-repin.patch` (the three pins to the
-   merged rev, the one-line platform pick in `host.rs`) as its own PR.
-5. **T3 gate** (monitor, remote only): the flow in plan §7 T3.
-6. **T4** per plan §8 against `.21` and `.173`; then correct the scope lines on `samsung-tv.md`
-   ("What the TV app does and does not do") and the codec gate in `video.ts` if HEVC turns out to
-   be software.
-7. **T5**: `git am patches/monorepo/t5-docs/*.patch`, push, PR. Tag a client-web release from
-   `main` (#42 and #44 are in): the `.wgt` lands on it. Install it once through Apps2Samsung to prove the
-   unsigned-zip route; then, with your yes, the catalog PR to `Apps2Samsung/tizen-community-packages`
-   adding `packages/punktfunk__client-web.json` as plan §6 spells it.
-8. **Planning repo**: paste `planning/outcomes.md` into the plan's §0 and §7 and the index line into
-   `design/README.md`; commit and push.
+## Build
 
-## Decisions taken while implementing (all within the plan; flag if any is wrong)
+Needs what client-web needs: Node 24, the Rust toolchain its `rust-toolchain.toml` names, emsdk
+6.0.10, and access to the `@punktfunk` and `@unom` npm scopes on `git.unom.io`.
 
-- **A 30 s per-request read timeout on the tunnel** (408), beside §4.1's caps: a stream opened and
-  left silent would otherwise hold one of the sixteen slots forever and the 60 s idle close would
-  never fire.
-- **`PeerCertFingerprint(None)` is inserted** on tunnelled requests, as the plain nvhttp listener
-  does, rather than leaving the extension absent: it reads as "no client certificate" either way,
-  and a handler that extracts it as required cannot 500.
-- **Paths are checked raw and percent-decoded**, with dot and empty segments refused; `is_confined`
-  is unchanged by D5 (the list only ever constrained pages).
-- **The plain router is `None` when the plane is off** (no sniff at all), not a router that answers
-  404: a host serving no browsers must not start answering plaintext at all.
-- **`HostTarget.tunnel`** is how the client names the route (plan §4.2 left the shape open); the
-  bootstrap doubles as the reach probe, and a plane-off host gets its own sentence
-  ("Browser streaming is off on this host…").
-- **IME field `inputmode`**: `numeric` for a PIN or a port (`digits: true`), `decimal` for an
-  address — the plan said `decimal`; a typed hostname (`host.local`) is not enterable with either,
-  which is D4 as decided.
-- **The quick menu's first row on a TV is Disconnect, keep the game running**, not End stream: a
-  Back-then-Enter by reflex must not end what someone is playing.
-- **Package id `punktfunk0`**, application id `punktfunk0.punktfunk`, widget id
-  `https://github.com/punktfunk/client-web/tizen`. Fixed for the life of the app; change them now
-  or never.
-- **The kit's `codecs()` for Tizen is `[auto, hevc, h264]`** (like webOS): the console's codec row
-  offers what the set decodes, matching the client-side AV1 gate.
-- **T4-dependent scope lines** on `samsung-tv.md` are written as "H.264 and HEVC up to 1080p60, no
-  AV1/HDR/4K, a measured stream decides each" so the page is honest before T4 and easy to correct
-  after.
+```sh
+npm run build                      # clones client-web at client-web.ref into client-web/, builds, packages
+CLIENT_WEB=../client-web npm run build     # uses a checkout you already have, as it is
+PF_APP_DIST=../client-web/apps/web/dist npm run build   # packages a dist/ you already built
+```
 
-## What was verified here, and what was not
+The result is `build/app/` (the staged package) and `build/punktfunk-tizen-<version>.wgt`, where
+the version is this repository's tag.
 
-Verified: the host crate's full suite, clippy, fmt and the two CI scripts; the console kit's suite
-with `--no-default-features` (this container has no SDL3; the Ubuntu 26.04 CI image does); the
-stream package's type-check and tests (41, 9 new); the web app's type-check against a shim for
-`@unom/ui` (the Gitea npm registry was unreachable; `@punktfunk/host` was built from `sdk/` in
-the mirror); the zip writer against a stand-in `dist-tizen`; the icon rendered and inspected.
+## Sign and install, by hand
 
-Verified on GitHub Actions (all three PRs green): the real wasm build, the type-check against
-the real `@unom/ui`, and on #44 `npm run build:tizen` end to end — `dist-tizen/` with
-`config.xml`, `icon.png` and no source maps, then `punktfunk-tizen-0.2.0.wgt` (15 files,
-unsigned) uploaded as the `punktfunk-tizen` run artifact.
+Apps2Samsung does this for an owner. For development, or a set it does not reach:
 
-Not verified: anything on a set, Safari, or a real host.
+```sh
+docker build --platform linux/amd64 -t punktfunk-tizen-cli:10.0 tools/toolchain
+# once per set: samsung-tv-cert --duid "$(sdb shell 0 getduid)" --profile punktfunk
+tools/sign.sh                                   # build/app → build/punktfunk-tizen-<v>-signed.wgt
+TV=192.168.1.50 tools/sign.sh install           # ... then sdb connect, install, launch
+tools/sign.sh punktfunk-tizen-0.1.0.wgt         # sign a downloaded release asset instead
+```
+
+The script's header lists the three signing traps it handles. The DUID is the one `sdb shell 0
+getduid` prints, not what `webapis.productinfo.getDuid()` returns.
+
+## Release
+
+Tag `vX.Y.Z` on `main`. CI builds the package from `client-web.ref` and attaches
+`punktfunk-tizen-X.Y.Z.wgt` to the release; Apps2Samsung picks it up through the catalog entry.
+To ship a newer page, bump `client-web.ref` first.
+
+## Status
+
+T0 (the probe as an app) is green on a Samsung Odyssey OLED G9 on Tizen 9.0. The host side (the
+plain-HTTP bootstrap and the `/mgmt` tunnel), the client side (client-web) and this package are
+implemented; the first install of this package on a set, the remote-only walk-through and the
+measured first stream are still open. The gates and who runs them: `docs/handoff-2026-10-02.md`.
+
+## License
+
+MIT or Apache-2.0, as client-web.
