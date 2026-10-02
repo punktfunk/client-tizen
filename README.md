@@ -1,20 +1,21 @@
 # Tizen client — implementation handoff (2026-10-02)
 
 The work for `design/tizen-client-implementation-plan.md` (planning `main` @ `6f6c989`), done from a
-cloud session that could reach GitHub but not `git.unom.io`. Everything that could be pushed is
-pushed; everything bound for Gitea is here as a patch series. Every on-device gate is open.
+cloud session. The client-web pull requests are merged into `main`; the monorepo pieces are here
+as patch series, rebased onto Gitea `main` @ `270349a`, waiting on a Gitea credential to push.
+Every on-device gate is open.
 
 ## Where things are
 
 | Package | What | Where | State |
 |---|---|---|---|
-| T1 host | plaintext bootstrap, `/mgmt` tunnel, D5, docs line | `patches/monorepo/t1/` (3 patches on `unom/punktfunk` `main` @ `31c1f4c`) | code + tests done; not pushed; gate open |
-| T2 client | `tunnel.ts`, bootstrap, injection, `--mode tizen`, `.wgt`, lifecycle, codec/WebGL2 gates | client-web [#42](https://github.com/punktfunk/client-web/pull/42), branch `tizen/t2-tunnel-and-packaging` | PR open; gate open |
-| T3 remote | Back, HUD and sheets by remote, IME text entry, Quit → exit, console-first | client-web [#43](https://github.com/punktfunk/client-web/pull/43) (on #42) | PR open; gate open |
-| T3 console kit | `Platform::Tizen` in `pf-console-ui` + bridge flag + test | `patches/monorepo/t3-console-kit/` (1 patch on `main` @ `31c1f4c`) | code + tests done (396/396 kit tests); not pushed |
+| T1 host | plaintext bootstrap, `/mgmt` tunnel, D5, docs line | `patches/monorepo/t1/` (3 patches on `unom/punktfunk` `main` @ `270349a`) | code + tests done; not pushed; gate open |
+| T2 client | `tunnel.ts`, bootstrap, injection, `--mode tizen`, `.wgt`, lifecycle, codec/WebGL2 gates | client-web [#42](https://github.com/punktfunk/client-web/pull/42) | **merged** (`372a6bb`); gate open |
+| T3 remote | Back, HUD and sheets by remote, IME text entry, Quit → exit, console-first | client-web [#43](https://github.com/punktfunk/client-web/pull/43) | **merged** (`6fa6ad0`); gate open |
+| T3 console kit | `Platform::Tizen` in `pf-console-ui` + bridge flag + test | `patches/monorepo/t3-console-kit/` (1 patch on `main` @ `270349a`) | code + tests done (396/396 kit tests); not pushed |
 | T3 re-pin | the three crate pins + one line in `rust/host.rs` | `patches/client-web/after-repin.patch` (instructions) | after the kit merges |
 | T4 | measured first stream | — | not started |
-| T5 CI | `.wgt` on `v*` releases | client-web [#44](https://github.com/punktfunk/client-web/pull/44) (on #42) | PR open |
+| T5 CI | `.wgt` on `v*` releases | client-web [#44](https://github.com/punktfunk/client-web/pull/44) | **merged** (`4e2d7c3`) |
 | T5 docs | `samsung-tv.md` + links | `patches/monorepo/t5-docs/` | done; not pushed |
 | T5 catalog | Apps2Samsung PR | — | needs the maintainer's yes (outward publish) |
 | T5 diagnostics line | model, Tizen version, firmware, Chromium in the sent log | in #42 (`logs.ts`) | done |
@@ -27,9 +28,9 @@ planning doc and its index is `planning/outcomes.md`.
 1. **T1 to Gitea.** In the monorepo at `origin/main`: `git am patches/monorepo/t1/*.patch`, push
    as `tizen/t1-mgmt-tunnel`, open the PR with `review/T1-security-review.md` as the body's review
    section. Gates it passed here: `cargo test -p punktfunk-host` (968/968), clippy `-D warnings`,
-   fmt, `check-writing.sh`, `check-docs-drift.sh`. The patches apply on `31c1f4c`; the GitHub
-   mirror was at that commit when they were made.
-2. **T1 gate** (Mac Studio, host `.21` rebuilt with T1): check out client-web `tizen/t2-tunnel-and-packaging`,
+   fmt, `check-writing.sh`, `check-docs-drift.sh`. The patches are rebased onto Gitea `main` @
+   `270349a` and the targeted tests were rerun there.
+2. **T1 gate** (Mac Studio, host `.21` rebuilt with T1): check out client-web `main`,
    `PF_HOST` unset, `npx vite` in `apps/web`, open
    `http://127.0.0.1:5173/_e2e.html?tunnel=1&host=192.168.1.21` in Safari. Pairs (Request access
    or `&pin=`) and lists the library through the tunnel; the page-server and direct paths still work
@@ -38,7 +39,7 @@ planning doc and its index is `planning/outcomes.md`.
    page's CORS read of the bootstrap needs its origin listed or the list empty, so test D5 with the
    TV, not Safari.
 3. **T2 gate** (monitor, ask before each install): on the Mac Studio with emsdk,
-   `npm run build:tizen` in client-web at `tizen/t2-tunnel-and-packaging` → `apps/web/punktfunk-tizen-<v>.wgt`.
+   `npm run build:tizen` in client-web at `main` → `apps/web/punktfunk-tizen-<v>.wgt`.
    Sign and install with `design/tizen-probe/package-app.sh` as the template (unzip the `.wgt`, sign
    the directory, `tizen install`). Launch, add `.21` by address, Request access, approve, library
    and covers. The USB keyboard is allowed for this one.
@@ -46,14 +47,14 @@ planning doc and its index is `planning/outcomes.md`.
    `tizen/t3-console-platform`, PR, merge. Gates it passed here: `cargo test -p pf-console-ui
    --no-default-features` (396/396; this container has no SDL3 for the desktop feature's link),
    clippy `-D warnings` with default features, fmt, `check-writing.sh`.
-   Then in client-web on top of #43: `patches/client-web/after-repin.patch` (the three pins to the
-   merged rev, the one-line platform pick in `host.rs`), push to `tizen/t3-remote`.
+   Then in client-web on `main`: `patches/client-web/after-repin.patch` (the three pins to the
+   merged rev, the one-line platform pick in `host.rs`) as its own PR.
 5. **T3 gate** (monitor, remote only): the flow in plan §7 T3.
 6. **T4** per plan §8 against `.21` and `.173`; then correct the scope lines on `samsung-tv.md`
    ("What the TV app does and does not do") and the codec gate in `video.ts` if HEVC turns out to
    be software.
-7. **T5**: `git am patches/monorepo/t5-docs/*.patch`, push, PR. Tag a client-web release once #42
-   and #44 are in: the `.wgt` lands on it. Install it once through Apps2Samsung to prove the
+7. **T5**: `git am patches/monorepo/t5-docs/*.patch`, push, PR. Tag a client-web release from
+   `main` (#42 and #44 are in): the `.wgt` lands on it. Install it once through Apps2Samsung to prove the
    unsigned-zip route; then, with your yes, the catalog PR to `Apps2Samsung/tizen-community-packages`
    adding `packages/punktfunk__client-web.json` as plan §6 spells it.
 8. **Planning repo**: paste `planning/outcomes.md` into the plan's §0 and §7 and the index line into

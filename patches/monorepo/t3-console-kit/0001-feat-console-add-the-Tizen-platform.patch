@@ -1,4 +1,4 @@
-From a99ed37b201d9af52132f8025e7352e19674bb74 Mon Sep 17 00:00:00 2001
+From 1646ab025299652e148d02d5d11e0efd4ce2b1b9 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Enrico=20B=C3=BChler?= <enrico.buehler@unom.io>
 Date: Fri, 2 Oct 2026 22:32:51 +0000
 Subject: [PATCH] feat(console): add the Tizen platform
@@ -25,7 +25,7 @@ name the platform; the native hosts name theirs in code.
  6 files changed, 86 insertions(+), 21 deletions(-)
 
 diff --git a/crates/pf-console-ui/src/bridge.rs b/crates/pf-console-ui/src/bridge.rs
-index c938cb3..619fda4 100644
+index c938cb3d..619fda4b 100644
 --- a/crates/pf-console-ui/src/bridge.rs
 +++ b/crates/pf-console-ui/src/bridge.rs
 @@ -26,6 +26,11 @@ pub struct CreateOptions {
@@ -41,7 +41,7 @@ index c938cb3..619fda4 100644
      /// console never draws its tray: an Apple TV's, where iPhone typing works.
      #[serde(default)]
 diff --git a/crates/pf-console-ui/src/glyphs.rs b/crates/pf-console-ui/src/glyphs.rs
-index 1035fb7..0b09fa7 100644
+index 1035fb78..0b09fa79 100644
 --- a/crates/pf-console-ui/src/glyphs.rs
 +++ b/crates/pf-console-ui/src/glyphs.rs
 @@ -54,7 +54,9 @@ impl GlyphStyle {
@@ -56,7 +56,7 @@ index 1035fb7..0b09fa7 100644
          }
      }
 diff --git a/crates/pf-console-ui/src/platform.rs b/crates/pf-console-ui/src/platform.rs
-index 48ae7b0..da07169 100644
+index 48ae7b0c..da07169c 100644
 --- a/crates/pf-console-ui/src/platform.rs
 +++ b/crates/pf-console-ui/src/platform.rs
 @@ -21,21 +21,27 @@ pub enum Platform {
@@ -90,7 +90,7 @@ index 48ae7b0..da07169 100644
          !matches!(self, Platform::Apple | Platform::Web)
      }
 diff --git a/crates/pf-console-ui/src/screens/ring_editor.rs b/crates/pf-console-ui/src/screens/ring_editor.rs
-index 6a9e5d2..78877cf 100644
+index 6a9e5d20..78877cfd 100644
 --- a/crates/pf-console-ui/src/screens/ring_editor.rs
 +++ b/crates/pf-console-ui/src/screens/ring_editor.rs
 @@ -36,9 +36,9 @@ const RING_W: f64 = 2.0 * RING_ABOVE + 24.0;
@@ -107,7 +107,7 @@ index 6a9e5d2..78877cf 100644
          crate::platform::Platform::Android | crate::platform::Platform::Apple => {
              RingPlatform::Touch
 diff --git a/crates/pf-console-ui/src/screens/settings.rs b/crates/pf-console-ui/src/screens/settings.rs
-index ff42344..d82d274 100644
+index ff42344d..d82d274c 100644
 --- a/crates/pf-console-ui/src/screens/settings.rs
 +++ b/crates/pf-console-ui/src/screens/settings.rs
 @@ -248,7 +248,7 @@ pub(crate) fn own_stats_corner(platform: crate::platform::Platform) -> HudCorner
@@ -236,7 +236,7 @@ index ff42344..d82d274 100644
                   always — for a device that lives docked to a TV. The switch above turns it \
                   off altogether."
 diff --git a/crates/pf-console-ui/src/screens/settings/tests.rs b/crates/pf-console-ui/src/screens/settings/tests.rs
-index f8cf664..05c3e58 100644
+index f8cf6647..05c3e587 100644
 --- a/crates/pf-console-ui/src/screens/settings/tests.rs
 +++ b/crates/pf-console-ui/src/screens/settings/tests.rs
 @@ -1307,7 +1307,8 @@ fn every_platform_offers_rows() {

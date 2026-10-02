@@ -1,4 +1,4 @@
-From 68b85f0ef79bf70f54545c08f33f274e68fb7c19 Mon Sep 17 00:00:00 2001
+From b640d40aac18697d5578bd909501638a1610f6b1 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Enrico=20B=C3=BChler?= <enrico.buehler@unom.io>
 Date: Fri, 2 Oct 2026 22:29:18 +0000
 Subject: [PATCH] docs(clients): add the Samsung TV install page
@@ -23,7 +23,7 @@ refusal. The clients index and the install table link it.
  create mode 100644 docs-site/content/docs/(guide)/(clients)/samsung-tv.md
 
 diff --git a/docs-site/content/docs/(guide)/(clients)/browser-client.md b/docs-site/content/docs/(guide)/(clients)/browser-client.md
-index 81967c7..655326a 100644
+index 81967c72..655326a0 100644
 --- a/docs-site/content/docs/(guide)/(clients)/browser-client.md
 +++ b/docs-site/content/docs/(guide)/(clients)/browser-client.md
 @@ -7,7 +7,8 @@ Stream in a browser tab with nothing to install: you run the page once on your n
@@ -37,7 +37,7 @@ index 81967c7..655326a 100644
  ## 1. Turn on browser streaming on the host
  
 diff --git a/docs-site/content/docs/(guide)/(clients)/clients.md b/docs-site/content/docs/(guide)/(clients)/clients.md
-index b381171..6965bb2 100644
+index b381171a..6965bb29 100644
 --- a/docs-site/content/docs/(guide)/(clients)/clients.md
 +++ b/docs-site/content/docs/(guide)/(clients)/clients.md
 @@ -1,6 +1,6 @@
@@ -57,7 +57,7 @@ index b381171..6965bb2 100644
  | Any other device | [Moonlight](#moonlight-anything-else) |
  | Scripts and home automation | The [`punktfunk` command](#scripting-the-punktfunk-cli) |
 diff --git a/docs-site/content/docs/(guide)/(clients)/install-client.md b/docs-site/content/docs/(guide)/(clients)/install-client.md
-index 22f7775..25b277f 100644
+index 22f77756..25b277ff 100644
 --- a/docs-site/content/docs/(guide)/(clients)/install-client.md
 +++ b/docs-site/content/docs/(guide)/(clients)/install-client.md
 @@ -19,6 +19,7 @@ These links are the **stable** channel. For builds of `main`, see [Release Chann
@@ -69,7 +69,7 @@ index 22f7775..25b277f 100644
  
  ## Linux desktop (Flatpak)
 diff --git a/docs-site/content/docs/(guide)/(clients)/meta.json b/docs-site/content/docs/(guide)/(clients)/meta.json
-index 3e8cca7..9f70d1b 100644
+index 3e8cca72..9f70d1bb 100644
 --- a/docs-site/content/docs/(guide)/(clients)/meta.json
 +++ b/docs-site/content/docs/(guide)/(clients)/meta.json
 @@ -5,6 +5,7 @@
@@ -82,7 +82,7 @@ index 3e8cca7..9f70d1b 100644
      "linux-arm",
 diff --git a/docs-site/content/docs/(guide)/(clients)/samsung-tv.md b/docs-site/content/docs/(guide)/(clients)/samsung-tv.md
 new file mode 100644
-index 0000000..df59d55
+index 00000000..df59d558
 --- /dev/null
 +++ b/docs-site/content/docs/(guide)/(clients)/samsung-tv.md
 @@ -0,0 +1,116 @@

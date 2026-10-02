@@ -1,4 +1,4 @@
-From a604142a198376477218f06b225c049651f3cb6d Mon Sep 17 00:00:00 2001
+From 661f833698ce0b0058cfd2af5c027ede10685268 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Enrico=20B=C3=BChler?= <enrico.buehler@unom.io>
 Date: Fri, 2 Oct 2026 22:19:03 +0000
 Subject: [PATCH 2/3] feat(host/mgmt): answer the plane bootstrap over plain
@@ -22,7 +22,7 @@ paired page checks against the identity it pinned. Every other path is
  2 files changed, 154 insertions(+), 6 deletions(-)
 
 diff --git a/crates/punktfunk-host/src/gamestream/tls.rs b/crates/punktfunk-host/src/gamestream/tls.rs
-index fb20a63..6d42a23 100644
+index fb20a633..6d42a234 100644
 --- a/crates/punktfunk-host/src/gamestream/tls.rs
 +++ b/crates/punktfunk-host/src/gamestream/tls.rs
 @@ -106,6 +106,9 @@ impl Drop for IpGuard {
@@ -203,7 +203,7 @@ index fb20a63..6d42a23 100644
      async fn configured_header_timeout_has_a_timer() {
          let (mut client, server) = tokio::io::duplex(4096);
 diff --git a/crates/punktfunk-host/src/mgmt.rs b/crates/punktfunk-host/src/mgmt.rs
-index c458df3..1dd2231 100644
+index c458df37..1dd2231f 100644
 --- a/crates/punktfunk-host/src/mgmt.rs
 +++ b/crates/punktfunk-host/src/mgmt.rs
 @@ -14,9 +14,10 @@

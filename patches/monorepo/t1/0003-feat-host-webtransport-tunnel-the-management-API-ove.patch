@@ -1,4 +1,4 @@
-From 3f27e9db28334a4582e1252c8c75efe21851fd26 Mon Sep 17 00:00:00 2001
+From 5fc7ed681277ca8688a2ba70a7319d4bab6df797 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Enrico=20B=C3=BChler?= <enrico.buehler@unom.io>
 Date: Fri, 2 Oct 2026 22:19:03 +0000
 Subject: [PATCH 3/3] feat(host/webtransport): tunnel the management API over
@@ -24,7 +24,7 @@ a minute idle. A tunnel takes no streaming slot and no handshake clock.
  create mode 100644 crates/punktfunk-host/src/webtransport/mgmt.rs
 
 diff --git a/crates/punktfunk-host/src/mgmt/tests.rs b/crates/punktfunk-host/src/mgmt/tests.rs
-index 36e6bae..7b24500 100644
+index 36e6bae8..7b245003 100644
 --- a/crates/punktfunk-host/src/mgmt/tests.rs
 +++ b/crates/punktfunk-host/src/mgmt/tests.rs
 @@ -4408,6 +4408,188 @@ async fn provider_running_report_validation() {
@@ -218,7 +218,7 @@ index 36e6bae..7b24500 100644
  ///
 diff --git a/crates/punktfunk-host/src/webtransport/mgmt.rs b/crates/punktfunk-host/src/webtransport/mgmt.rs
 new file mode 100644
-index 0000000..889a83d
+index 00000000..889a83dc
 --- /dev/null
 +++ b/crates/punktfunk-host/src/webtransport/mgmt.rs
 @@ -0,0 +1,627 @@

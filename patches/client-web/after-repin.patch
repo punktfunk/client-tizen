@@ -1,5 +1,5 @@
-The client-web change that follows the monorepo's `Platform::Tizen` merge. Apply on top of
-`tizen/t3-remote` (client-web #43) once `tizen/t3-console-platform` is on Gitea `main` at a rev R:
+The client-web change that follows the monorepo's `Platform::Tizen` merge. Apply on client-web
+`main` (#43 is merged) once `tizen/t3-console-platform` is on Gitea `main` at a rev R:
 
 1. `packages/stream/Cargo.toml`: the three `rev = "25506f01b"` lines (punktfunk-core,
    pf-console-ui, pf-client-core) become `rev = "R"`. All three move together.
