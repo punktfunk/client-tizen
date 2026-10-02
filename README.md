@@ -11,7 +11,7 @@ pushed; everything bound for Gitea is here as a patch series. Every on-device ga
 | T1 host | plaintext bootstrap, `/mgmt` tunnel, D5, docs line | `patches/monorepo/t1/` (3 patches on `unom/punktfunk` `main` @ `31c1f4c`) | code + tests done; not pushed; gate open |
 | T2 client | `tunnel.ts`, bootstrap, injection, `--mode tizen`, `.wgt`, lifecycle, codec/WebGL2 gates | client-web [#42](https://github.com/punktfunk/client-web/pull/42), branch `tizen/t2-tunnel-and-packaging` | PR open; gate open |
 | T3 remote | Back, HUD and sheets by remote, IME text entry, Quit → exit, console-first | client-web [#43](https://github.com/punktfunk/client-web/pull/43) (on #42) | PR open; gate open |
-| T3 console kit | `Platform::Tizen` in `pf-console-ui` + bridge flag + test | `patches/monorepo/t3-console-kit/` | code + tests done; not pushed |
+| T3 console kit | `Platform::Tizen` in `pf-console-ui` + bridge flag + test | `patches/monorepo/t3-console-kit/` (1 patch on `main` @ `31c1f4c`) | code + tests done (396/396 kit tests); not pushed |
 | T3 re-pin | the three crate pins + one line in `rust/host.rs` | `patches/client-web/after-repin.patch` (instructions) | after the kit merges |
 | T4 | measured first stream | — | not started |
 | T5 CI | `.wgt` on `v*` releases | client-web [#44](https://github.com/punktfunk/client-web/pull/44) (on #42) | PR open |
@@ -42,7 +42,10 @@ planning doc and its index is `planning/outcomes.md`.
    Sign and install with `design/tizen-probe/package-app.sh` as the template (unzip the `.wgt`, sign
    the directory, `tizen install`). Launch, add `.21` by address, Request access, approve, library
    and covers. The USB keyboard is allowed for this one.
-4. **T3 kit to Gitea**: `git am patches/monorepo/t3-console-kit/*.patch` on `main`, push, PR, merge.
+4. **T3 kit to Gitea**: `git am patches/monorepo/t3-console-kit/*.patch` on `main`, push as
+   `tizen/t3-console-platform`, PR, merge. Gates it passed here: `cargo test -p pf-console-ui
+   --no-default-features` (396/396; this container has no SDL3 for the desktop feature's link),
+   clippy `-D warnings` with default features, fmt, `check-writing.sh`.
    Then in client-web on top of #43: `patches/client-web/after-repin.patch` (the three pins to the
    merged rev, the one-line platform pick in `host.rs`), push to `tizen/t3-remote`.
 5. **T3 gate** (monitor, remote only): the flow in plan §7 T3.
@@ -93,5 +96,9 @@ stream package's type-check and tests (41, 9 new); the web app's type-check agai
 `@unom/ui` (the Gitea npm registry was unreachable; `@punktfunk/host` was built from `sdk/` in
 the mirror); the zip writer against a stand-in `dist-tizen`; the icon rendered and inspected.
 
-Not verified: the wasm build (no emsdk), `vite build --mode tizen` end to end, anything on a set,
-Safari, or a real host.
+Verified on GitHub Actions (all three PRs green): the real wasm build, the type-check against
+the real `@unom/ui`, and on #44 `npm run build:tizen` end to end — `dist-tizen/` with
+`config.xml`, `icon.png` and no source maps, then `punktfunk-tizen-0.2.0.wgt` (15 files,
+unsigned) uploaded as the `punktfunk-tizen` run artifact.
+
+Not verified: anything on a set, Safari, or a real host.
