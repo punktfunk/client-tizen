@@ -1,0 +1,19 @@
+The client-web change that follows the monorepo's `Platform::Tizen` merge. Apply on top of
+`tizen/t3-remote` (client-web #43) once `tizen/t3-console-platform` is on Gitea `main` at a rev R:
+
+1. `packages/stream/Cargo.toml`: the three `rev = "25506f01b"` lines (punktfunk-core,
+   pf-console-ui, pf-client-core) become `rev = "R"`. All three move together.
+2. `packages/stream/rust/host.rs`, in `start(opts: CreateOptions)`:
+
+--- a/packages/stream/rust/host.rs
++++ b/packages/stream/rust/host.rs
+@@
+-    let (mut opts, entry, store) = opts.into_console(Platform::Web);
++    // A packaged Samsung TV page says so at start; the kit then answers with the page's rows,
++    // a remote's glyphs and an exit on Back at the root.
++    let platform = if opts.tizen { Platform::Tizen } else { Platform::Web };
++    let (mut opts, entry, store) = opts.into_console(platform);
+
+3. Commit as `chore(stream): pin the console kit with the Tizen platform`, body: why the re-pin
+   (the kit raises Quit and draws the remote legend only on `Platform::Tizen`; the page already
+   passes `tizen: true`).
