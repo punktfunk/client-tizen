@@ -99,7 +99,7 @@ function packageDist(dist, v) {
     const end = at < 0 ? 0 : html.indexOf(">", at) + 1;
     writeFileSync(index, `${html.slice(0, end)}\n${tag}${html.slice(end)}`);
   }
-  const config = readFileSync(join(root, "tizen", "config.xml"), "utf8").replace(/version="[^"]*"/, `version="${v}"`);
+  const config = readFileSync(join(root, "tizen", "config.xml"), "utf8").replace(/(<widget\b[^>]*\sversion=")[^"]*"/, `$1${v}"`);
   writeFileSync(join(stage, "config.xml"), config);
   cpSync(join(root, "tizen", "icon.png"), join(stage, "icon.png"));
   const list = files(stage);

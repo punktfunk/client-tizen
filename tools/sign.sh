@@ -37,7 +37,7 @@ case "${1:-}" in
     ;;
 esac
 [ -f "$stage/config.xml" ] || { echo "no staged package at $stage — run node tools/build.mjs first, or pass a .wgt"; exit 1; }
-version=$(sed -n 's/.*<widget[^>]*version="\([^"]*\)".*/\1/p' "$stage/config.xml" | head -1)
+version=$(tr '\n' ' ' < "$stage/config.xml" | sed -n 's/.*<widget[^>]*[[:space:]]version="\([^"]*\)".*/\1/p')
 version=${version:-0.0.0}
 
 certs=$HOME/tizen-studio-data/SamsungCertificate/$PROFILE
