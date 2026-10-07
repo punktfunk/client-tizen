@@ -32,4 +32,8 @@
                  background-support="disable"
                  hwkey-event="enable"/>
   <tizen:metadata key="http://samsung.com/tv/metadata/use.game.mode" value="true"/>
+  <!-- An ultrawide set hands the page more than a 16:9 box: the Odyssey G9 gives 2520×1080
+       (21:9; Samsung reserves 32:9 for particular models). `window.innerWidth` follows and the
+       page lays itself out to it. Costs about a quarter of the console's frame rate there. -->
+  <tizen:metadata key="http://tizen.org/metadata/app_ui_type/base_screen_resolution" value="extensive"/>
 </widget>
