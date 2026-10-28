@@ -1,6 +1,6 @@
-# punktfunk for Samsung TV
+# Punktfunk for Samsung TV
 
-The punktfunk client for Samsung TVs, as a Tizen web app. It is the
+The Punktfunk client for Samsung TVs, as a Tizen web app. It is the
 [browser client](https://github.com/punktfunk/client-web) packaged as a `.wgt`: the same page,
 started in Punktfunk Console for the remote, reaching the host through the browser plane because a
 packaged page cannot `fetch` a self-signed host. Nothing is forked. This repository holds what the
