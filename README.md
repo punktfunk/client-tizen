@@ -69,6 +69,10 @@ plain-HTTP bootstrap and the `/mgmt` tunnel), the client side (client-web) and t
 implemented; the first install of this package on a set, the remote-only walk-through and the
 measured first stream are still open. The gates and who runs them: `docs/handoff-2026-10-02.md`.
 
+## Use of AI
+
+This project uses AI for writing code.
+
 ## License
 
 MIT or Apache-2.0, as client-web.
